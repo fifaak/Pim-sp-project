@@ -2,12 +2,23 @@
 import folium
 from folium.features import CustomIcon
 
-def create_map(A_states, B_states,output):
-    # Create a map centered around a specific location
-    m = folium.Map(location=[14.538365933300948, 100.91024909968965], zoom_start=16.5)
-
+def create_map(A_states, B_states, output):
     # Directory where the custom icons are stored
     icon_dir = './icons/'  # Ensure this directory contains your custom icons named according to marker names
+
+    # Add the Google Satellite tile layer before creating the map
+    google_satellite = folium.TileLayer(
+        tiles='http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',
+        attr='Google',
+        name='Google Satellite',
+        subdomains=['mt0', 'mt1', 'mt2', 'mt3']
+    )
+
+    # Create a map centered around a specific location with no initial tile layer
+    m = folium.Map(location=[14.538365933300948, 100.91024909968965], zoom_start=16.5, tiles=None)
+
+    # Add the Google Satellite layer first to make it the default
+    google_satellite.add_to(m)
 
     # Add markers with custom icons
     markers = {
@@ -47,13 +58,7 @@ def create_map(A_states, B_states,output):
     b_coords = [markers[f"B{i}"] for i in range(1, 5)]
     folium.PolyLine(b_coords, color=output[1], weight=7, opacity=1).add_to(m)
 
-    # Add different tile layers including the custom Google Satellite layer
-    folium.TileLayer(
-        tiles='http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',
-        attr='Google',
-        name='Google Satellite',
-        subdomains=['mt0', 'mt1', 'mt2', 'mt3']
-    ).add_to(m)
+    # Add different tile layers
     folium.TileLayer('OpenStreetMap', name='OpenStreetMap').add_to(m)
     folium.TileLayer('Stamen Terrain', name='Terrain').add_to(m)
     folium.TileLayer('Stamen Toner', name='Toner').add_to(m)
