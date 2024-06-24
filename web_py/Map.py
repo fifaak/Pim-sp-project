@@ -15,7 +15,7 @@ def create_map(A_states, B_states, output):
     )
 
     # Create a map centered around a specific location with no initial tile layer
-    m = folium.Map(location=[14.538365933300948, 100.91024909968965], zoom_start=16.5, tiles=None)
+    m = folium.Map(location=[14.538365933300948, 100.91024909968965], zoom_start=16, tiles=None)
 
     # Add the Google Satellite layer first to make it the default
     google_satellite.add_to(m)

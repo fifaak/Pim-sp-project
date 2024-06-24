@@ -1,8 +1,6 @@
 import streamlit as st
 import datetime
-import folium
 from streamlit.components.v1 import html
-import matplotlib.pyplot as plt
 from Map import create_map
 from Logic import GET_TFL
 from Sidebar import *
@@ -52,10 +50,10 @@ def send_line_notify_with_image(token, message, image_path):
 
 
 def main():
-    st.title("ระบบตรวจรถติดหน้าโรงเรียนของเรา")
+    st.title("ระบบตรวจรถติดหน้าบิ๊กซีเพลสสาขาสระบุรี")
 
     # Replace 'YOUR_TOKEN' with your Line Notify token
-    token = 'Fk02i4X2ULksk8SDuHns04x5ZucLk6NyhI9CjIlWmpF'
+    token = '4bC9CyPGMlFdUfSLwTFL47TG1bccAEz3bSdh4hJ6upp'
 
     
     A1,A2,A3,A4,B1,B2,B3,B4 = show_sidebar()
@@ -74,13 +72,13 @@ def main():
 
     if (output[2]=="ALERT"):
         # status = send_line_notify_with_image(token, "มึงอะตัวปลอม กุอะตัวจริง","./asset/image.png")
-        # send_line_notify(token, "ทำไรกันอะพวกข้างหน้า")
         current_time = datetime.datetime.now()
         if (output[1]=="GREEN"):
             road = "B"
         else:
             road = "A"
         TEMP_STATE = "ALERT"
+        #send_line_notify(token, f'เตือน!!! ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} \n ถนนสาย {road} ตรวจพบการจราจรติดขัด')
         st.warning(f'เตือน!!! ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} \n ถนนสาย {road} ตรวจพบการจราจรติดขัด')
 
     elif (output[2]=="NORMAL") and (TEMP_STATE=="ALERT"):
@@ -92,12 +90,16 @@ def main():
     print("TEMP_STATE:",TEMP_STATE)
 
 
-    
     # Display the map using an HTML iframe
     with open("map.html", "r") as f:
         map_html = f.read()
+    map_html = f"""
+    <div style="width: 100vw; height: 800px;">
+        {map_html}
+    </div>
+    """
 
-        st.components.v1.html(map_html, width=1000, height=800)
+    st.components.v1.html(map_html,height=700)
 
 
 
