@@ -1,5 +1,6 @@
 import streamlit as st
 import datetime
+import folium
 from streamlit.components.v1 import html
 from Map import create_map
 from Logic import GET_TFL
