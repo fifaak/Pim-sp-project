@@ -1,4 +1,5 @@
 import streamlit as st
+import warnings
 import datetime
 import folium
 from streamlit.components.v1 import html
@@ -8,12 +9,15 @@ from Sidebar import *
 from math_logic import *
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
-import time
 import requests
+from pytz import timezone
+from streamlit_autorefresh import st_autorefresh
 
-# Force Streamlit to rerun the script and clear cache
+# Suppress warnings
+warnings.filterwarnings('ignore')
+
+# Set Streamlit page configuration
 st.set_page_config(page_title="Traffic Monitoring App", layout="wide")
-st.cache_data.clear()
 
 # Custom CSS for removing top margin or padding
 st.markdown("""
@@ -30,6 +34,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+# Function to send Line notifications
 def send_line_notify(token, message):
     url = 'https://notify-api.line.me/api/notify'
     headers = {'Authorization': 'Bearer ' + token}
@@ -92,55 +97,56 @@ def main():
     
     # Create empty placeholders for the graph and data
     graph_placeholder = st.sidebar.empty()
-    times = []
-    sensor1_data = []
-    sensor2_data = []
+    times = st.session_state.get('times', [])
+    sensor1_data = st.session_state.get('sensor1_data', [])
+    sensor2_data = st.session_state.get('sensor2_data', [])
     
-    TEMP_STATE = "NORMAL"
+    TEMP_STATE = st.session_state.get('TEMP_STATE', "NORMAL")
     
-    # Main loop
-    while True:
-        current_time = datetime.datetime.now()
-        
-        A1, A2, A3, A4, B1, B2, B3, B4 = show_sidebar()
-        output = GET_TFL(A1, A2, A3, A4, B1, B2, B3, B4)
-        
-        # Update sensor data and time
-        times.append(current_time)
-        sensor1_data.append(sum([A1, A2, A3, A4]))
-        sensor2_data.append(sum([B1, B2, B3, B4]))
-        
-        # Keep only the last 50 data points
-        times = times[-50:]
-        sensor1_data = sensor1_data[-50:]
-        sensor2_data = sensor2_data[-50:]
-        
-        # Update the graph
-        fig = create_traffic_graph(times, sensor1_data, sensor2_data)
-        graph_placeholder.plotly_chart(fig, use_container_width=True)
-        
-        st.write(f"ถนนฝั่งรร.อนุบาลสระบุรี: {output[0]}, ถนนสายรร.สระบุรีวิทยาคม: {output[1]}, สถานะ: {output[2]}")
-        
-        # Prepare the states to pass to the map
-        A_states = {"A1": A1, "A2": A2, "A3": A3, "A4": A4}
-        B_states = {"B1": B1, "B2": B2, "B3": B3, "B4": B4}
+    # Set timezone to Thailand
+    tz = timezone('Asia/Bangkok')
+    current_time = datetime.datetime.now(tz)
+    
+    A1, A2, A3, A4, B1, B2, B3, B4 = show_sidebar()
+    output = GET_TFL(A1, A2, A3, A4, B1, B2, B3, B4)
+    
+    # Update sensor data and time
+    times.append(current_time)
+    sensor1_data.append(sum([A1, A2, A3, A4]))
+    sensor2_data.append(sum([B1, B2, B3, B4]))
+    
+    # Keep only the last 50 data points
+    times = times[-50:]
+    sensor1_data = sensor1_data[-50:]
+    sensor2_data = sensor2_data[-50:]
+    
+    # Update the graph
+    fig = create_traffic_graph(times, sensor1_data, sensor2_data)
+    graph_placeholder.plotly_chart(fig, use_container_width=True)
+    
+    st.write(f"ถนนฝั่งรร.อนุบาลสระบุรี: {output[0]}, ถนนสายรร.สระบุรีวิทยาคม: {output[1]}, สถานะ: {output[2]}")
+    
+    # Prepare the states to pass to the map
+    A_states = {"A1": A1, "A2": A2, "A3": A3, "A4": A4}
+    B_states = {"B1": B1, "B2": B2, "B3": B3, "B4": B4}
 
-        # Create the map with updated icon states
-        my_map = create_map(A_states, B_states, output)
+    # Create the map with updated icon states
+    my_map = create_map(A_states, B_states, output)
 
-        if (output[2] == "ALERT"):
-            if (output[1] == "GREEN"):
-                road = "โรงเรียนสระบุรีวิทยาคม"
-            else:
-                road = "โรงเรียนอนุบาลสระบุรี"
-            TEMP_STATE = "ALERT"
-            st.warning(f'เตือน!!! ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} \n ถนนฝั่ง {road} ตรวจพบการจราจรติดขัด')
-        elif (output[2] == "NORMAL") and (TEMP_STATE == "ALERT"):
-            st.warning(f'ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} การจราจรกลับมาเป็นปกติ')
-            TEMP_STATE = "NORMAL"
-        print("TEMP_STATE:", TEMP_STATE)
+    if (output[2] == "ALERT"):
+        if (output[1] == "GREEN"):
+            road = "โรงเรียนสระบุรีวิทยาคม"
+        else:
+            road = "โรงเรียนอนุบาลสระบุรี"
+        TEMP_STATE = "ALERT"
+        st.warning(f'เตือน!!! ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} \n ถนนฝั่ง {road} ตรวจพบการจราจรติดขัด')
+    elif (output[2] == "NORMAL") and (TEMP_STATE == "ALERT"):
+        st.warning(f'ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} การจราจรกลับมาเป็นปกติ')
+        TEMP_STATE = "NORMAL"
+    print("TEMP_STATE:", TEMP_STATE)
 
-        # Display the map using an HTML iframe
+    # Display the map using an HTML iframe
+    try:
         with open("map.html", "r") as f:
             map_html = f.read()
         map_html = f"""
@@ -148,11 +154,18 @@ def main():
             {map_html}
         </div>
         """
-
         st.components.v1.html(map_html, height=700)
-        
-        # Add a short delay to control the update frequency
-        time.sleep(1)  # Update every second
+    except Exception as e:
+        st.error(f"Error loading map.html: {e}")
+
+    # Store state in session_state
+    st.session_state.times = times
+    st.session_state.sensor1_data = sensor1_data
+    st.session_state.sensor2_data = sensor2_data
+    st.session_state.TEMP_STATE = TEMP_STATE
+
+# Refresh the app every 60 seconds
+st_autorefresh(interval=60 * 1000)
 
 if __name__ == "__main__":
     main()
