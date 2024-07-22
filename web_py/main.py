@@ -81,7 +81,6 @@ def main():
         TEMP_STATE = "ALERT"
         #send_line_notify(token, f'เตือน!!! ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} \n ถนนฝั่ง {road} ตรวจพบการจราจรติดขัด')
         st.warning(f'เตือน!!! ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} \n ถนนฝั่ง {road} ตรวจพบการจราจรติดขัด')
-544r
     elif (output[2]=="NORMAL") and (TEMP_STATE=="ALERT"):
         current_time = datetime.datetime.now()
 
