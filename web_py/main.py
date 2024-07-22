@@ -6,6 +6,8 @@ from Map import create_map
 from Logic import GET_TFL
 from Sidebar import *
 from math_logic import *
+import plotly.graph_objs as go
+import numpy as np
 # Custom CSS for removing top margin or padding
 # st.set_page_config(page_title="Traffic Monitoring App", page_config_layout="wide")
 
@@ -48,17 +50,44 @@ def send_line_notify_with_image(token, message, image_path):
     return response.status_code, response.json()
 
 
-
+def create_traffic_graph(sensor1_data, sensor2_data):
+    fig = go.Figure()
+    
+    fig.add_trace(go.Scatter(y=sensor1_data, mode='lines', name='Sensor 1'))
+    fig.add_trace(go.Scatter(y=sensor2_data, mode='lines', name='Sensor 2'))
+    
+    fig.update_layout(
+        title='Real-time Traffic Data',
+        xaxis_title='Time',
+        yaxis_title='Traffic Amount',
+        height=300,
+        margin=dict(l=0, r=0, t=30, b=0)
+    )
+    
+    return fig
 
 def main():
     st.title("ระบบตรวจรถติดหน้าบิ๊กซีเพลสสาขาสระบุรี")
 
     # Replace 'YOUR_TOKEN' with your Line Notify token
     token = '4bC9CyPGMlFdUfSLwTFL47TG1bccAEz3bSdh4hJ6upp'
-
+    # Create empty placeholders for the graph and data
+    graph_placeholder = st.sidebar.empty()
+    sensor1_data = []
+    sensor2_data = []
     
     A1,A2,A3,A4,B1,B2,B3,B4 = show_sidebar()
     output = GET_TFL(A1, A2, A3, A4, B1, B2, B3, B4)
+    sensor1_data.append(sum([A1, A2, A3, A4]))
+    sensor2_data.append(sum([B1, B2, B3, B4]))
+    
+    # Keep only the last 50 data points
+    sensor1_data = sensor1_data[-50:]
+    sensor2_data = sensor2_data[-50:]
+    
+    # Update the graph
+    fig = create_traffic_graph(sensor1_data, sensor2_data)
+    graph_placeholder.plotly_chart(fig, use_container_width=True)
     st.write(f"ถนนฝั่งรร.อนุบาลสระบุรี: {output[0]}, ถนนสายรร.สระบุรีวิทยาคม: {output[1]}, สถานะ: {output[2]}")
     
     # Prepare the states to pass to the map
