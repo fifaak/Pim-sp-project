@@ -75,13 +75,13 @@ def main():
         # status = send_line_notify_with_image(token, "มึงอะตัวปลอม กุอะตัวจริง","./asset/image.png")
         current_time = datetime.datetime.now()
         if (output[1]=="GREEN"):
-            road = "B"
+            road = "โรงเรียนสระบุรีวิทยาคม"
         else:
-            road = "A"
+            road = "โรงเรียนอนุบาลสระบุรี"
         TEMP_STATE = "ALERT"
-        #send_line_notify(token, f'เตือน!!! ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} \n ถนนสาย {road} ตรวจพบการจราจรติดขัด')
-        st.warning(f'เตือน!!! ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} \n ถนนสาย {road} ตรวจพบการจราจรติดขัด')
-
+        #send_line_notify(token, f'เตือน!!! ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} \n ถนนฝั่ง {road} ตรวจพบการจราจรติดขัด')
+        st.warning(f'เตือน!!! ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} \n ถนนฝั่ง {road} ตรวจพบการจราจรติดขัด')
+544r
     elif (output[2]=="NORMAL") and (TEMP_STATE=="ALERT"):
         current_time = datetime.datetime.now()
 
