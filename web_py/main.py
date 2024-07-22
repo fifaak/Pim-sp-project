@@ -59,7 +59,7 @@ def main():
     
     A1,A2,A3,A4,B1,B2,B3,B4 = show_sidebar()
     output = GET_TFL(A1, A2, A3, A4, B1, B2, B3, B4)
-    st.write(f"Traffic Light A: {output[0]}, Traffic Light B: {output[1]}, Status: {output[2]}")
+    st.write(f"ถนนฝั่งรร.อนุบาลสระบุรี: {output[0]}, ถนนสายรร.สระบุรีวิทยาคม: {output[1]}, สถานะ: {output[2]}")
     
     # Prepare the states to pass to the map
     A_states = {"A1": A1, "A2": A2, "A3": A3, "A4": A4}
@@ -86,7 +86,6 @@ def main():
 
         st.warning(f'ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} การจราจรกลับมาเป็นปกติ')
         TEMP_STATE = "NORMAL"
-        #status = send_line_notify(token, "กูไงฟีฟ่า จำไม่ได้หรอ")
     print("TEMP_STATE:",TEMP_STATE)
 
 
