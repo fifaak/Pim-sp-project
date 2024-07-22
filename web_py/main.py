@@ -140,8 +140,12 @@ def main():
             road = "โรงเรียนอนุบาลสระบุรี"
         TEMP_STATE = "ALERT"
         st.warning(f'เตือน!!! ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} \n ถนนฝั่ง {road} ตรวจพบการจราจรติดขัด')
+        send_line_notify(token, f'เตือน!!! ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} \n ถนนสาย {road} ตรวจพบการจราจรติดขัด')
+
     elif (output[2] == "NORMAL") and (TEMP_STATE == "ALERT"):
         st.warning(f'ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} การจราจรกลับมาเป็นปกติ')
+        send_line_notify(token, f'ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} การจราจรกลับมาเป็นปกติ')
+
         TEMP_STATE = "NORMAL"
     print("TEMP_STATE:", TEMP_STATE)
 
