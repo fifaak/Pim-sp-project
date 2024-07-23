@@ -142,7 +142,7 @@ def main():
         st.warning(f'เตือน!!! ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} \n ถนนฝั่ง {road} ตรวจพบการจราจรติดขัด')
         send_line_notify(token, f'เตือน!!! ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} \n ถนนสาย {road} ตรวจพบการจราจรติดขัด')
 
-    elif (output[2] == "NORMAL") and (TEMP_STATE == "ALERT"):
+    elif ((output[2] == "NORMAL") and (TEMP_STATE == "ALERT") and (sum([A1, A2, A3, A4])<3) and (sum([B1, B2, B3, B4])<3)):
         st.warning(f'ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} การจราจรกลับมาเป็นปกติ')
         send_line_notify(token, f'ณ เวลา {current_time.strftime("%d/%m/%Y %H:%M น.")} การจราจรกลับมาเป็นปกติ')
 
